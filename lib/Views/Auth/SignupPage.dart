@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nampy_frontend/Components/NPButton.dart';
 import 'package:nampy_frontend/Components/NPInputField.dart';
 import 'package:nampy_frontend/Validators/Validator.dart';
+import 'package:nampy_frontend/Views/Global/Theme.dart';
 
 class SignupPage extends StatefulWidget {
   @override
@@ -11,8 +12,9 @@ class SignupPage extends StatefulWidget {
 class _SignupPageState extends State<SignupPage> {
   final _formKey = GlobalKey<FormState>();
   int _currentStep = 0;
-  String? _selectedOption;
+  String? _selectedDesignation;
 
+  double _progressValue = (1 / 3) - 0.1; // Start with 1/3 progress
   // Controllers for form data
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
@@ -20,14 +22,15 @@ class _SignupPageState extends State<SignupPage> {
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
-  final TextEditingController _bioController = TextEditingController();
+  final TextEditingController _confirmpasswordController =
+      TextEditingController();
 
   void _nextStep() {
     if (_formKey.currentState!.validate()) {
       if (_currentStep < 2) {
         setState(() {
           _currentStep++;
+          _progressValue = ((_currentStep + 1) / 3) - 0.1;
         });
       } else {
         _submitForm(); // Final submission
@@ -43,9 +46,7 @@ class _SignupPageState extends State<SignupPage> {
       print("Username: ${_usernameController.text}");
       print("Email: ${_emailController.text}");
       print("Password: ${_passwordController.text}");
-      print("Bio: ${_bioController.text}");
-
-      // TODO: Submit form to backend
+      print("Designation: ${_selectedDesignation}");
     }
   }
 
@@ -61,16 +62,58 @@ class _SignupPageState extends State<SignupPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  buildProgressBar((_currentStep + 1) / 3),
-                  const SizedBox(height: 20),
-                  headerText(
-                    context,
-                    stepHeader1[_currentStep],
-                    stepHeader2[_currentStep],
+                  /// 🎯 Animated Progress Bar
+                  TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 0, end: _progressValue),
+                    duration: const Duration(milliseconds: 500),
+                    builder: (context, value, _) {
+                      return buildProgressBar(context, value);
+                    },
                   ),
+                  const SizedBox(height: 20),
+
+                  /// 🎯 Animated Header Text
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    transitionBuilder: (child, animation) {
+                      return SlideTransition(
+                        position: Tween<Offset>(
+                          begin: const Offset(1, 0),
+                          end: Offset.zero,
+                        ).animate(animation),
+                        child: FadeTransition(opacity: animation, child: child),
+                      );
+                    },
+                    child: headerText(
+                      context,
+                      stepHeader1[_currentStep],
+                      stepHeader2[_currentStep],
+                      key: ValueKey(_currentStep),
+                    ),
+                  ),
+
                   const SizedBox(height: 30),
-                  ..._buildStepFields(),
+
+                  /// 🎯 Animated Fields
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 400),
+                    transitionBuilder: (child, animation) {
+                      return SlideTransition(
+                        position: Tween<Offset>(
+                          begin: const Offset(1, 0),
+                          end: Offset.zero,
+                        ).animate(animation),
+                        child: FadeTransition(opacity: animation, child: child),
+                      );
+                    },
+                    child: Column(
+                      key: ValueKey(_currentStep),
+                      children: _buildStepFields(),
+                    ),
+                  ),
+
                   const SizedBox(height: 30),
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
@@ -138,15 +181,18 @@ class _SignupPageState extends State<SignupPage> {
           const SizedBox(height: 20),
           NPInputField(
             labelText: 'Confirm Password',
-            controller: _passwordController,
+            controller: _confirmpasswordController,
             placeholder: 'Enter your Password',
-            validator: Validator.validatePassword,
+            validator: (value) => Validator.validateConfirmPassword(
+              _passwordController.text,
+              value,
+            ),
           ),
         ];
       case 2:
         return [
           DropdownButtonFormField<String>(
-            value: _selectedOption,
+            value: _selectedDesignation,
             decoration: InputDecoration(
               labelText: 'Select Designation',
               border: OutlineInputBorder(),
@@ -166,7 +212,7 @@ class _SignupPageState extends State<SignupPage> {
             }).toList(),
             onChanged: (value) {
               setState(() {
-                _selectedOption = value;
+                _selectedDesignation = value;
               });
             },
             validator: Validator.validateField, // Optional: same as used before
@@ -180,8 +226,8 @@ class _SignupPageState extends State<SignupPage> {
 
 final List<String> stepHeader1 = [
   "Welcome learner, create your account in just 3 easy steps!",
-  "You're halfway there!",
-  "Almost done!",
+  "You're almost there!",
+  "Just a little bit of information to complete your profile!",
 ];
 
 final List<String> stepHeader2 = [
@@ -190,7 +236,7 @@ final List<String> stepHeader2 = [
   "Add a small intro to complete!",
 ];
 
-Widget buildProgressBar(double value) {
+Widget buildProgressBar(BuildContext context, double value) {
   return Container(
     margin: const EdgeInsets.symmetric(vertical: 24),
     height: 20,
@@ -210,15 +256,17 @@ Widget buildProgressBar(double value) {
       child: LinearProgressIndicator(
         value: value,
         backgroundColor: Colors.transparent,
-        valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+        valueColor: AlwaysStoppedAnimation<Color>(AppColors.secondary),
         minHeight: 20,
       ),
     ),
   );
 }
 
-Widget headerText(BuildContext context, String text1, String text2) {
+Widget headerText(BuildContext context, String text1, String text2,
+    {Key? key}) {
   return Column(
+    key: key,
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text(text1, style: Theme.of(context).textTheme.bodyMedium),
@@ -227,18 +275,3 @@ Widget headerText(BuildContext context, String text1, String text2) {
     ],
   );
 }
-
-// Widget inputField(String label, TextEditingController controller,
-//     String? Function(String?) validator,
-//     {bool obscure = false}) {
-//   return TextFormField(
-//     controller: controller,
-//     obscureText: obscure,
-//     decoration: InputDecoration(
-//       labelText: label,
-//       border: const OutlineInputBorder(),
-//       contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-//     ),
-//     validator: validator,
-//   );
-// }
