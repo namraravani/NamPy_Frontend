@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nampy_frontend/Views/Global/Theme.dart';
 
 class NPInputField extends StatelessWidget {
   final String labelText;
@@ -24,9 +25,30 @@ class NPInputField extends StatelessWidget {
       decoration: InputDecoration(
         labelText: labelText,
         hintText: placeholder,
-        border: const OutlineInputBorder(),
         contentPadding:
             const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+
+        // Border when not focused
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: AppColors.primary), // customize color
+        ),
+
+        // Border when focused
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+              color: AppColors.secondary,
+              width: 2), // customize color & thickness
+        ),
+
+        // Border when error exists
+        errorBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: AppColors.danger),
+        ),
+
+        // Border when focused and error exists
+        focusedErrorBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: AppColors.danger, width: 2),
+        ),
       ),
       validator: validator,
     );

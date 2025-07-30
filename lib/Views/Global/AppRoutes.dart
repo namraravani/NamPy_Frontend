@@ -11,10 +11,10 @@ class AppRoutes {
 
     switch (settings.name) {
       case '/':
-        page = SplashScreen();
+        page = SignupPage();
         break;
       case '/start':
-        page = StartPage();
+        page = FOISelectionPage();
         break;
       case '/signup':
         page = SignupPage();
@@ -39,7 +39,7 @@ class AppRoutes {
       transitionDuration: const Duration(milliseconds: 400),
       transitionsBuilder: (_, animation, __, child) {
         final offsetAnimation = Tween<Offset>(
-          begin: const Offset(1.0, 0.0),
+          begin: const Offset(3.0, 0.0),
           end: Offset.zero,
         ).animate(CurvedAnimation(parent: animation, curve: Curves.easeInOut));
 

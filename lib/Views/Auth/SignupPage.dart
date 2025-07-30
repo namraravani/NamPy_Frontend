@@ -3,6 +3,7 @@ import 'package:nampy_frontend/Components/NPButton.dart';
 import 'package:nampy_frontend/Components/NPInputField.dart';
 import 'package:nampy_frontend/Validators/Validator.dart';
 import 'package:nampy_frontend/Views/Global/Theme.dart';
+import 'package:searchfield/searchfield.dart';
 
 class SignupPage extends StatefulWidget {
   @override
@@ -13,6 +14,15 @@ class _SignupPageState extends State<SignupPage> {
   final _formKey = GlobalKey<FormState>();
   int _currentStep = 0;
   String? _selectedDesignation;
+  final List<String> _allFields = [
+    'Computer Science',
+    'Data Science',
+    'Machine Learning',
+    'Artificial Intelligence',
+  ];
+
+  List<String> _availableFields = [];
+  List<String> _selectedFields = [];
 
   double _progressValue = (1 / 3) - 0.1; // Start with 1/3 progress
   // Controllers for form data
@@ -35,6 +45,15 @@ class _SignupPageState extends State<SignupPage> {
       } else {
         _submitForm(); // Final submission
       }
+    }
+  }
+
+  void _onFieldSelected(String value) {
+    if (_availableFields.contains(value)) {
+      setState(() {
+        _selectedFields.add(value);
+        _availableFields.remove(value);
+      });
     }
   }
 
@@ -191,31 +210,87 @@ class _SignupPageState extends State<SignupPage> {
         ];
       case 2:
         return [
-          DropdownButtonFormField<String>(
-            value: _selectedDesignation,
-            decoration: InputDecoration(
-              labelText: 'Select Designation',
-              border: OutlineInputBorder(),
-              contentPadding:
-                  EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+          SizedBox(
+            width: double.infinity,
+            child: Column(
+              children: [
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    child: Text("Select a Field of Interest"),
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.symmetric(vertical: 16),
+                  child: Theme(
+                    data: Theme.of(context).copyWith(
+                      inputDecorationTheme: InputDecorationTheme(
+                        hintStyle: const TextStyle(color: Colors.grey),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 14),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: AppColors.primary),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide:
+                              BorderSide(color: AppColors.secondary, width: 2),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                    child: SearchField<String>(
+                      hint: 'Search Field of Interest',
+                      suggestions: _availableFields
+                          .map((field) => SearchFieldListItem<String>(field))
+                          .toList(),
+                      onSuggestionTap: (SearchFieldListItem<String> item) {
+                        _onFieldSelected(item.searchKey);
+                      },
+                    ),
+                  ),
+                ),
+
+                // Display selected fields below the dropdown
+                if (_selectedFields.isNotEmpty)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(top: 20, bottom: 8, left: 4),
+                        child: Text(
+                          "Selected Fields:",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
+                      ),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: _selectedFields
+                            .map(
+                              (field) => Chip(
+                                label: Text(field),
+                                backgroundColor: AppColors.primary,
+                                deleteIcon: const Icon(Icons.close,
+                                    color: Colors.white, size: 18),
+                                onDeleted: () {
+                                  setState(() {
+                                    _selectedFields.remove(field);
+                                    _availableFields.add(field);
+                                  });
+                                },
+                                labelStyle:
+                                    const TextStyle(color: Colors.white),
+                              ),
+                            )
+                            .toList(),
+                      ),
+                    ],
+                  ),
+              ],
             ),
-            items: [
-              'Student',
-              'Professional',
-              'Freelancer',
-              'Entrepreneur',
-            ].map((option) {
-              return DropdownMenuItem(
-                value: option,
-                child: Text(option),
-              );
-            }).toList(),
-            onChanged: (value) {
-              setState(() {
-                _selectedDesignation = value;
-              });
-            },
-            validator: Validator.validateField, // Optional: same as used before
           ),
         ];
       default:

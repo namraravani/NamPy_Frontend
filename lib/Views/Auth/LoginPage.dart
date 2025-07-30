@@ -63,11 +63,24 @@ class _LoginPageState extends State<LoginPage> {
                       const SizedBox(height: 20),
                       NPInputField(
                         labelText: 'Password',
-                        controller: _emailController,
+                        controller: _passwordController,
                         placeholder: 'Enter your Password',
                         validator: Validator.validatePassword,
                       ),
-                      const SizedBox(height: 30),
+                      const SizedBox(height: 5),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () {
+                            // TODO: Add navigation logic to Forgot Password page
+                          },
+                          child: Text(
+                            'Forgot Password?',
+                            style: TextStyle(color: AppColors.primary),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
                       NPButton(
                         label: 'Login',
                         onPressed: () {

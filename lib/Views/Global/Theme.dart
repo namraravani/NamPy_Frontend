@@ -7,7 +7,7 @@ class AppColors {
   static const Color background =
       Color.fromARGB(255, 255, 255, 255); // Light grey
   static const Color text = Color(0xFF000000); // Black
-  static const Color accent = Color(0xFFFF5722); // Deep orange
+  static const Color danger = Color(0xFFFF5722); // Deep orange
 }
 
 class AppTheme {
