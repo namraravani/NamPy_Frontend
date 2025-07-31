@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:nampy_frontend/Views/Auth/LoginPage.dart';
 import 'package:nampy_frontend/Views/Auth/SignupPage.dart';
 import 'package:nampy_frontend/Views/Auth/StartPage.dart';
-import 'package:nampy_frontend/Views/FOISelectionPage.dart';
 import 'package:nampy_frontend/Views/SplashScreen.dart';
 
 class AppRoutes {
@@ -11,10 +10,10 @@ class AppRoutes {
 
     switch (settings.name) {
       case '/':
-        page = SignupPage();
+        page = SplashScreen();
         break;
       case '/start':
-        page = FOISelectionPage();
+        page = StartPage();
         break;
       case '/signup':
         page = SignupPage();
@@ -22,9 +21,7 @@ class AppRoutes {
       case '/login':
         page = const LoginPage();
         break;
-      case '/foi-selection':
-        page = FOISelectionPage();
-        break;
+
       default:
         page = const Scaffold(body: Center(child: Text('Page not found')));
     }

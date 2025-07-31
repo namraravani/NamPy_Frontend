@@ -20,7 +20,7 @@ class _SignupPageState extends State<SignupPage> {
     'Machine Learning',
     'Artificial Intelligence',
   ];
-
+  bool _hasInitializedDropdown = false;
   List<String> _availableFields = [];
   List<String> _selectedFields = [];
 
@@ -42,6 +42,11 @@ class _SignupPageState extends State<SignupPage> {
           _currentStep++;
           _progressValue = ((_currentStep + 1) / 3) - 0.1;
         });
+      }
+      if (_currentStep == 2 && !_hasInitializedDropdown) {
+        _availableFields = List.from(_allFields);
+        _selectedFields.clear();
+        _hasInitializedDropdown = true;
       } else {
         _submitForm(); // Final submission
       }
@@ -210,85 +215,95 @@ class _SignupPageState extends State<SignupPage> {
         ];
       case 2:
         return [
-          SizedBox(
-            width: double.infinity,
+          SingleChildScrollView(
             child: Column(
               children: [
-                const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: Text("Select a Field of Interest"),
-                  ),
-                ),
-                Container(
-                  margin: const EdgeInsets.symmetric(vertical: 16),
-                  child: Theme(
-                    data: Theme.of(context).copyWith(
-                      inputDecorationTheme: InputDecorationTheme(
-                        hintStyle: const TextStyle(color: Colors.grey),
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 14),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: AppColors.primary),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide:
-                              BorderSide(color: AppColors.secondary, width: 2),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                    child: SearchField<String>(
-                      hint: 'Search Field of Interest',
-                      suggestions: _availableFields
-                          .map((field) => SearchFieldListItem<String>(field))
-                          .toList(),
-                      onSuggestionTap: (SearchFieldListItem<String> item) {
-                        _onFieldSelected(item.searchKey);
-                      },
-                    ),
-                  ),
-                ),
-
-                // Display selected fields below the dropdown
-                if (_selectedFields.isNotEmpty)
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                SizedBox(
+                  width: double.infinity,
+                  child: Column(
                     children: [
-                      const Padding(
-                        padding: EdgeInsets.only(top: 20, bottom: 8, left: 4),
-                        child: Text(
-                          "Selected Fields:",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16),
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 16),
+                          child: Text("Select a Field of Interest"),
                         ),
                       ),
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: _selectedFields
-                            .map(
-                              (field) => Chip(
-                                label: Text(field),
-                                backgroundColor: AppColors.primary,
-                                deleteIcon: const Icon(Icons.close,
-                                    color: Colors.white, size: 18),
-                                onDeleted: () {
-                                  setState(() {
-                                    _selectedFields.remove(field);
-                                    _availableFields.add(field);
-                                  });
-                                },
-                                labelStyle:
-                                    const TextStyle(color: Colors.white),
+                      Container(
+                        margin: const EdgeInsets.symmetric(vertical: 16),
+                        child: Theme(
+                          data: Theme.of(context).copyWith(
+                            inputDecorationTheme: InputDecorationTheme(
+                              hintStyle: const TextStyle(color: Colors.grey),
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 14),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: AppColors.primary),
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                            )
-                            .toList(),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(
+                                    color: AppColors.secondary, width: 2),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          ),
+                          child: SearchField<String>(
+                            hint: 'Search Field of Interest',
+                            suggestions: _availableFields
+                                .map((field) =>
+                                    SearchFieldListItem<String>(field))
+                                .toList(),
+                            onSuggestionTap:
+                                (SearchFieldListItem<String> item) {
+                              _onFieldSelected(item.searchKey);
+                            },
+                          ),
+                        ),
                       ),
+
+                      // Display selected fields below the dropdown
+                      if (_selectedFields.isNotEmpty)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Padding(
+                              padding:
+                                  EdgeInsets.only(top: 20, bottom: 8, left: 4),
+                              child: Text(
+                                "Selected Fields:",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 16),
+                              ),
+                            ),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: _selectedFields
+                                  .map(
+                                    (field) => Chip(
+                                      label: Text(field),
+                                      backgroundColor: AppColors.primary,
+                                      deleteIcon: const Icon(Icons.close,
+                                          color: Colors.white, size: 18),
+                                      onDeleted: () {
+                                        setState(() {
+                                          _selectedFields.remove(field);
+                                          _availableFields.add(field);
+                                        });
+                                      },
+                                      labelStyle:
+                                          const TextStyle(color: Colors.white),
+                                    ),
+                                  )
+                                  .toList(),
+                            ),
+                          ],
+                        ),
                     ],
                   ),
+                ),
               ],
             ),
           ),
@@ -316,11 +331,11 @@ Widget buildProgressBar(BuildContext context, double value) {
     margin: const EdgeInsets.symmetric(vertical: 24),
     height: 20,
     decoration: BoxDecoration(
-      color: Colors.grey.shade300,
+      color: AppColors.secondary,
       borderRadius: BorderRadius.circular(12),
       boxShadow: [
         BoxShadow(
-          color: Colors.grey.shade200,
+          color: AppColors.secondary,
           blurRadius: 6,
           offset: const Offset(0, 3),
         ),
@@ -331,7 +346,7 @@ Widget buildProgressBar(BuildContext context, double value) {
       child: LinearProgressIndicator(
         value: value,
         backgroundColor: Colors.transparent,
-        valueColor: AlwaysStoppedAnimation<Color>(AppColors.secondary),
+        valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
         minHeight: 20,
       ),
     ),
