@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nampy_frontend/Views/Auth/LoginPage.dart';
 import 'package:nampy_frontend/Views/Auth/SignupPage.dart';
 import 'package:nampy_frontend/Views/Auth/StartPage.dart';
+import 'package:nampy_frontend/Views/DashboardScreen.dart';
 import 'package:nampy_frontend/Views/SplashScreen.dart';
 
 class AppRoutes {
@@ -20,6 +21,9 @@ class AppRoutes {
         break;
       case '/login':
         page = const LoginPage();
+
+      case '/dashboard':
+        page = const DashboardScreen();
         break;
 
       default:

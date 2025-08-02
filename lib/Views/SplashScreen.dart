@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:nampy_frontend/Components/Header.dart';
-import 'package:nampy_frontend/Views/Auth/StartPage.dart';
 import 'package:nampy_frontend/Views/Global/Theme.dart'; // Replace with your actual home page
 
 class SplashScreen extends StatefulWidget {

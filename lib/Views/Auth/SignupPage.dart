@@ -42,14 +42,22 @@ class _SignupPageState extends State<SignupPage> {
           _currentStep++;
           _progressValue = ((_currentStep + 1) / 3) - 0.1;
         });
+
+        if (_currentStep == 2 && !_hasInitializedDropdown) {
+          _availableFields = List.from(_allFields);
+          _selectedFields.clear();
+          _hasInitializedDropdown = true;
+        }
       }
-      if (_currentStep == 2 && !_hasInitializedDropdown) {
-        _availableFields = List.from(_allFields);
-        _selectedFields.clear();
-        _hasInitializedDropdown = true;
-      } else {
-        _submitForm(); // Final submission
-      }
+    }
+  }
+
+  void _previousStep() {
+    if (_currentStep > 0) {
+      setState(() {
+        _currentStep--;
+        _progressValue = ((_currentStep + 1) / 3) - 0.1;
+      });
     }
   }
 
@@ -71,6 +79,8 @@ class _SignupPageState extends State<SignupPage> {
       print("Email: ${_emailController.text}");
       print("Password: ${_passwordController.text}");
       print("Designation: ${_selectedDesignation}");
+
+      Navigator.of(context).pushNamed('/dashboard');
     }
   }
 
@@ -139,16 +149,33 @@ class _SignupPageState extends State<SignupPage> {
                   const SizedBox(height: 30),
 
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      if (_currentStep > 0)
+                        SizedBox(
+                          width: 140,
+                          child: NPButton(
+                            color: AppColors.danger,
+                            label: 'Previous',
+                            icon: Icons.arrow_back,
+                            onPressed: _previousStep,
+                          ),
+                        )
+                      else
+                        const SizedBox(
+                            width:
+                                140), // Empty space to align "Next" to the right
+
                       SizedBox(
                         width: 140,
                         child: NPButton(
+                          color: AppColors.primary,
                           label: _currentStep == 2 ? 'Submit' : 'Next',
                           icon: _currentStep == 2
                               ? Icons.check
                               : Icons.arrow_forward,
-                          onPressed: _nextStep,
+                          onPressed:
+                              _currentStep == 2 ? _submitForm : _nextStep,
                         ),
                       ),
                     ],

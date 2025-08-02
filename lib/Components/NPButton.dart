@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nampy_frontend/Views/Global/Theme.dart';
@@ -6,13 +7,20 @@ class NPButton extends StatelessWidget {
   final String label;
   final VoidCallback onPressed;
   final IconData? icon;
+  final Color color;
 
-  const NPButton({
+  NPButton({
     super.key,
     required this.label,
     required this.onPressed,
+    required this.color,
     this.icon,
   });
+
+  Future<void> _playClickSound() async {
+    final player = AudioPlayer();
+    await player.play(AssetSource('sounds/normal_button_click-3.mp3'));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,8 +43,9 @@ class NPButton extends StatelessWidget {
           ),
           // Actual Button
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               HapticFeedback.heavyImpact();
+              await _playClickSound();
               onPressed();
             },
             style: ButtonStyle(
@@ -44,7 +53,7 @@ class NPButton extends StatelessWidget {
               backgroundColor: MaterialStateProperty.resolveWith<Color>(
                 (states) => states.contains(MaterialState.pressed)
                     ? AppColors.secondary
-                    : AppColors.primary,
+                    : color,
               ),
               foregroundColor: MaterialStateProperty.all(Colors.white),
               elevation: MaterialStateProperty.all(0), // No default elevation

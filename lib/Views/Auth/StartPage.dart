@@ -54,6 +54,7 @@ class StartPage extends StatelessWidget {
                 Column(
                   children: [
                     NPButton(
+                      color: AppColors.primary,
                       label: 'New User',
                       onPressed: () {
                         // Navigate to SignupPage
@@ -71,6 +72,7 @@ class StartPage extends StatelessWidget {
 
                     // ─── Existing User button ───────────────────────
                     NPButton(
+                      color: AppColors.primary,
                       label: 'Exisiting User',
                       onPressed: () {
                         Navigator.pushReplacementNamed(context, '/login');

@@ -82,6 +82,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       const SizedBox(height: 20),
                       NPButton(
+                        color: AppColors.primary,
                         label: 'Login',
                         onPressed: () {
                           _submitForm();
